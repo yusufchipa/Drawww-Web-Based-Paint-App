@@ -7,6 +7,8 @@ function App() {
   const [currentTool, setCurrentTool] = useState('pencil');
   const [currentColor, setCurrentColor] = useState('#000000');
   const [brushSize, setBrushSize] = useState(5);
+  const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
   const canvasRef = useRef(null);
 
   const handleExport = () => {
@@ -23,9 +25,30 @@ function App() {
     }
   };
 
+  const handleUndo = () => {
+    if (canvasRef.current) {
+      canvasRef.current.undo();
+      updateUndoRedoState();
+    }
+  };
+
+  const handleRedo = () => {
+    if (canvasRef.current) {
+      canvasRef.current.redo();
+      updateUndoRedoState();
+    }
+  };
+
+  const updateUndoRedoState = () => {
+    if (canvasRef.current) {
+      setCanUndo(canvasRef.current.canUndo);
+      setCanRedo(canvasRef.current.canRedo);
+    }
+  };
+
   const handleCanvasChange = () => {
-    // Handle canvas changes if needed (e.g., for undo/redo functionality)
-    console.log('Canvas changed');
+    // Update undo/redo state when canvas changes
+    updateUndoRedoState();
   };
 
   return (
@@ -57,6 +80,10 @@ function App() {
           setBrushSize={setBrushSize}
           onExport={handleExport}
           onClear={handleClear}
+          onUndo={handleUndo}
+          onRedo={handleRedo}
+          canUndo={canUndo}
+          canRedo={canRedo}
         />
 
         <main className="canvas-area">

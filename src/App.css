@@ -591,6 +591,48 @@
   box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
 }
 
+/* Undo/Redo Buttons */
+.undo-redo-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.action-button.undo {
+  border-color: #8b5cf6;
+  color: #8b5cf6;
+}
+
+.action-button.undo:hover:not(.disabled) {
+  background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+  color: white;
+  box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4);
+}
+
+.action-button.redo {
+  border-color: #06b6d4;
+  color: #06b6d4;
+}
+
+.action-button.redo:hover:not(.disabled) {
+  background: linear-gradient(135deg, #06b6d4, #22d3ee);
+  color: white;
+  box-shadow: 0 10px 25px rgba(6, 182, 212, 0.4);
+}
+
+.action-button.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.action-button.disabled:hover {
+  background: linear-gradient(135deg, #fff, #f8f9ff);
+  color: inherit;
+  box-shadow: none;
+}
+
 /* Canvas Area */
 .canvas-area {
   flex: 1;

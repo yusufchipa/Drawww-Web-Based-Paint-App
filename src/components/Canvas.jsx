@@ -11,6 +11,8 @@ const Canvas = forwardRef(({
   const [isDrawing, setIsDrawing] = useState(false);
   const [lastPosition, setLastPosition] = useState({ x: 0, y: 0 });
   const [textInput, setTextInput] = useState({ show: false, x: 0, y: 0, text: '' });
+  const [history, setHistory] = useState([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
 
   // Define consistent white color
   const CANVAS_WHITE = '#FFFFFF';
@@ -34,6 +36,9 @@ const Canvas = forwardRef(({
     context.imageSmoothingEnabled = true;
 
     contextRef.current = context;
+
+    // Save initial state to history
+    setTimeout(() => saveState(), 100);
   }, []);
 
   // Update drawing settings when props change
@@ -100,6 +105,61 @@ const Canvas = forwardRef(({
       };
     }
   }, []);
+
+  // Save current canvas state to history
+  const saveState = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const imageData = canvas.toDataURL();
+    setHistory(prev => {
+      const newHistory = prev.slice(0, historyIndex + 1);
+      newHistory.push(imageData);
+      // Limit history to 50 states to prevent memory issues
+      if (newHistory.length > 50) {
+        newHistory.shift();
+        return newHistory;
+      }
+      return newHistory;
+    });
+    setHistoryIndex(prev => Math.min(prev + 1, 49));
+  }, [historyIndex]);
+
+  // Undo function
+  const undo = useCallback(() => {
+    if (historyIndex > 0) {
+      const newIndex = historyIndex - 1;
+      setHistoryIndex(newIndex);
+
+      const canvas = canvasRef.current;
+      const context = contextRef.current;
+      const img = new Image();
+
+      img.onload = () => {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(img, 0, 0);
+      };
+      img.src = history[newIndex];
+    }
+  }, [history, historyIndex]);
+
+  // Redo function
+  const redo = useCallback(() => {
+    if (historyIndex < history.length - 1) {
+      const newIndex = historyIndex + 1;
+      setHistoryIndex(newIndex);
+
+      const canvas = canvasRef.current;
+      const context = contextRef.current;
+      const img = new Image();
+
+      img.onload = () => {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(img, 0, 0);
+      };
+      img.src = history[newIndex];
+    }
+  }, [history, historyIndex]);
 
   // Helper function to convert hex to RGB
   const hexToRgb = (hex) => {
@@ -170,6 +230,7 @@ const Canvas = forwardRef(({
 
     if (currentTool === 'fill') {
       floodFill(Math.floor(position.x), Math.floor(position.y), currentColor);
+      saveState();
       if (onCanvasChange) {
         onCanvasChange();
       }
@@ -198,12 +259,14 @@ const Canvas = forwardRef(({
       context.textBaseline = 'top';
       context.fillText(text, textInput.x, textInput.y);
 
+      saveState();
+
       if (onCanvasChange) {
         onCanvasChange();
       }
     }
     setTextInput({ show: false, x: 0, y: 0, text: '' });
-  }, [textInput, brushSize, currentColor, onCanvasChange]);
+  }, [textInput, brushSize, currentColor, onCanvasChange, saveState]);
 
   const handleTextCancel = useCallback(() => {
     setTextInput({ show: false, x: 0, y: 0, text: '' });
@@ -229,15 +292,18 @@ const Canvas = forwardRef(({
   const stopDrawing = useCallback((event) => {
     if (!isDrawing) return;
     event.preventDefault();
-    
+
     setIsDrawing(false);
     contextRef.current.beginPath();
-    
+
+    // Save state after drawing
+    saveState();
+
     // Notify parent component of canvas change
     if (onCanvasChange) {
       onCanvasChange();
     }
-  }, [isDrawing, onCanvasChange]);
+  }, [isDrawing, onCanvasChange, saveState]);
 
   // Export canvas as PNG
   const exportToPNG = useCallback(() => {
@@ -288,15 +354,22 @@ const Canvas = forwardRef(({
     context.lineJoin = 'round';
     context.globalAlpha = 1.0;
 
+    // Save state after clearing
+    saveState();
+
     if (onCanvasChange) {
       onCanvasChange();
     }
-  }, [onCanvasChange, currentColor, brushSize]);
+  }, [onCanvasChange, currentColor, brushSize, saveState]);
 
   // Expose methods to parent component
   useImperativeHandle(ref, () => ({
     exportToPNG,
-    clearCanvas
+    clearCanvas,
+    undo,
+    redo,
+    canUndo: historyIndex > 0,
+    canRedo: historyIndex < history.length - 1
   }));
 
   return (

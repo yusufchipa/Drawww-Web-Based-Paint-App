@@ -9,19 +9,25 @@ import {
   Trash2,
   Minus,
   Plus,
-  Highlighter
+  Highlighter,
+  Undo,
+  Redo
 } from 'lucide-react';
 import ColorWheel from './ColorWheel';
 
-const Sidebar = ({ 
-  currentTool, 
-  setCurrentTool, 
-  currentColor, 
+const Sidebar = ({
+  currentTool,
+  setCurrentTool,
+  currentColor,
   setCurrentColor,
   brushSize,
   setBrushSize,
   onExport,
-  onClear
+  onClear,
+  onUndo,
+  onRedo,
+  canUndo,
+  canRedo
 }) => {
   const [showColorWheel, setShowColorWheel] = useState(false);
 
@@ -169,6 +175,24 @@ const Sidebar = ({
       <div className="sidebar-section">
         <h3 className="section-title">Actions</h3>
         <div className="actions-grid">
+          <div className="undo-redo-buttons">
+            <button
+              className={`action-button undo ${!canUndo ? 'disabled' : ''}`}
+              onClick={onUndo}
+              disabled={!canUndo}
+            >
+              <Undo size={18} />
+              <span>Undo</span>
+            </button>
+            <button
+              className={`action-button redo ${!canRedo ? 'disabled' : ''}`}
+              onClick={onRedo}
+              disabled={!canRedo}
+            >
+              <Redo size={18} />
+              <span>Redo</span>
+            </button>
+          </div>
           <button className="action-button export" onClick={onExport}>
             <Download size={18} />
             <span>Export PNG</span>
