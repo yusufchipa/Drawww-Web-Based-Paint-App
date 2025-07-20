@@ -60,7 +60,7 @@ function App() {
 
       <header className="app-header">
         <img
-          src="/src/assets/logo.webp"
+          src="/src/assets/logo.png"
           alt="E-Paint Logo"
           className="app-logo"
         />
