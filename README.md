@@ -4,7 +4,7 @@
   <img src="readme/banner.png" alt="Drawww Banner" width="100%" />
 </p>
 
-<h1 align="center">🎨 Drawww</h1>
+<h1 align="center">🎨 Dr-awww</h1>
 
 <p align="center">
   <strong>A modern web-based paint app packed with creative tools, playful visuals, and immaculate vibes ✨</strong>
