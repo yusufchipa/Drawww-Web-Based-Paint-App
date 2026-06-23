@@ -58,17 +58,12 @@ function App() {
       <div className="fun-decoration">✨</div>
       <div className="fun-decoration">🎭</div>
 
-      <header className="app-header">
-        <img
-          src="/src/assets/logo.png"
-          alt="E-Paint Logo"
-          className="app-logo"
-        />
-        <div className="header-content">
-          <h1>Drawww</h1>
-          <p>🎨 Unleash Your Creativity! 🌟</p>
-        </div>
-      </header>
+     <header className="app-header">
+  <div className="header-content">
+    <h1>Drawww</h1>
+    <p>🎨 Unleash Your Creativity! 🌟</p>
+  </div>
+</header>
 
       <div className="app-content">
         <Sidebar
